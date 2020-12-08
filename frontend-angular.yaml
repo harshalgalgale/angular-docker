@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: angular-frontend
+  namespace: "default"
+  labels:
+    app: angular-frontend
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: angular-frontend
+  template:
+    metadata:
+      labels:
+        app: angular-frontend
+        tier: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: harshalgalgale/angular-docker:latest 
+          # image: "gcr.io/kubernets-271416/angular-docker@sha256:92dbf946aa671cf80b6b0888844d000a854183ae09b0a3a5da2776399d5b62a3"
