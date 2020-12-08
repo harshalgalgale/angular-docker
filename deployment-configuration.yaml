@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: angular-frontend
+  name: angular-frontend
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: angular-frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: angular-frontend
+    spec:
+      containers:
+        - image: harshalgalgale/angular-docker
+          imagePullPolicy: IfNotPresent
+          name: angular-docker-sha256-1
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: angular-frontend
+  name: angular-frontend-hpa-jkut
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: angular-frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: angular-frontend
+  name: angular-frontend-service
+  namespace: default
+spec:
+  # clusterIP: 10.104.12.86
+  externalTrafficPolicy: Cluster
+  ports:
+    - nodePort: 32579
+      port: 90
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: angular-frontend
+  sessionAffinity: None
+  type: LoadBalancer
